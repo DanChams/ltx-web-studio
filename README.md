@@ -26,3 +26,18 @@ Placez `index.html`, `style.css` et `app.js` à la racine d'un dépôt. Pour un 
 ## Validation
 
 Syntaxe JavaScript et cohérence des paramètres vérifiées. Le schéma API a été obtenu depuis le service réel. Une génération complète avec quota utilisateur et le comportement visuel dans un navigateur restent à valider après hébergement.
+
+
+## Version 2 — film de 15 secondes et références
+
+La section « Ton film, plan par plan » ajoute :
+
+- Jusqu'à 12 références PNG/JPG/WebP, 15 Mo par image.
+- Import de vidéos lisibles par le navigateur, jusqu'à 100 Mo ; choix d'un instant et extraction locale d'images JPEG. Plusieurs captures de plusieurs vidéos peuvent être conservées.
+- Une image de départ par plan : il ne s'agit pas d'un conditionnement multi-images simultané ni d'un transfert de mouvement. La vidéo originale et son audio ne sont pas envoyés au modèle.
+- Jusqu'à 8 plans de 1 à 5 secondes, total maximal 15 secondes. Le bouton « Préparer 15 s » propose trois plans de 5 secondes.
+- Réorganisation et prompts distincts. Modifier une référence, un prompt, une durée ou les réglages de rendu invalide les clips concernés.
+- Génération séquentielle avec reprise des plans manquants après une erreur ou un quota, tant que l'onglet reste ouvert. Aucun contournement des quotas.
+- Téléchargement des clips reçus et assemblage local avec audio et coupes franches via Canvas, Web Audio et MediaRecorder. MP4 si le navigateur l'accepte, sinon WebM. Ce montage en temps réel nécessite un onglet visible ; sa durée peut varier légèrement. Aucun export de 15 minutes n'est annoncé.
+
+Les clips et références ne sont pas persistés après rechargement. Un avertissement de fermeture protège le travail en cours ; téléchargez les résultats. Les jetons ne sont jamais enregistrés. Les bibliothèques tierces sont importées depuis jsDelivr et la génération dépend de la disponibilité de Hugging Face.
