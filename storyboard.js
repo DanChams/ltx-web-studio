@@ -93,6 +93,7 @@ function renderShots() {
     if (ref) { const thumb = document.createElement('img'); thumb.className='shot-thumb'; thumb.src=ref.url; thumb.alt=ref.name; card.append(thumb); }
     const label = el('label','Mouvement / action'); const text = el('textarea'); text.rows=3; text.maxLength=4000; text.value=shot.prompt; text.id=`prompt-${shot.id}`; label.htmlFor=text.id;
     text.placeholder='Décris le mouvement et la lumière de ce plan…';
+    text.onchange = () => renderShots();
     text.oninput = () => { shot.prompt=text.value; invalidate(shot); top.lastChild.textContent=shot.state; updateSummary(); };
     const lengthLabel = el('label','Durée du plan'); const length = el('select'); length.id=`duration-${shot.id}`; lengthLabel.htmlFor=length.id;
     [1,2,3,4,5].forEach(n=>length.append(new Option(`${n} seconde${n>1?'s':''}`,String(n)))); length.value=String(shot.duration);
@@ -149,7 +150,7 @@ byId('board-generate').onclick=async()=>{
   let current=null;
   try{
     const {Client}=await import('https://cdn.jsdelivr.net/npm/@gradio/client@2.7.2/+esm');
-    const client=await Client.connect('Lightricks/LTX-2.5',token?{hf_token:token}:{});token='';byId('board-token').value='';
+    const client=await Client.connect('Lightricks/LTX-2.5',{events:['data','status'],...(token?{hf_token:token}:{})});token='';byId('board-token').value='';
     for(let i=0;i<shots.length;i++){
       if(cancelled)break;const shot=shots[i];if(shot.blob)continue;current=shot;
       const reference=refs.find(r=>r.id===shot.ref);
@@ -158,7 +159,7 @@ byId('board-generate').onclick=async()=>{
       let result=null;
       for await(const message of job){
         if(cancelled)break;
-        if(message.type==='status'&&message.stage==='error')throw new Error(message.message||'Génération refusée.');
+        if(message.type==='status'){if(message.stage==='error')throw new Error(message.message||'Génération refusée.');const rank=Number.isFinite(message.position)?` · position ${message.position+1}`:'';say(`Plan ${i+1}/${shots.length} : ${message.stage==='pending'?'file d’attente'+rank:'génération en cours'}…`);}
         if(message.type==='data')result=message.data;
       }
       job=null;if(cancelled){shot.state='À reprendre';break;}

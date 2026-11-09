@@ -55,7 +55,7 @@ $('form').addEventListener('submit', async e => {
   try {
     const {Client} = await import('https://cdn.jsdelivr.net/npm/@gradio/client@2.7.2/+esm');
     if (cancelled) return;
-    const client = await Client.connect(SPACE, token ? {hf_token:token} : {});
+    const client = await Client.connect(SPACE, {events:['data','status'], ...(token ? {hf_token:token} : {})});
     token = ''; $('token').value = '';
     if (cancelled) return;
     job = client.submit('/run', parameters);
@@ -91,3 +91,4 @@ $('form').addEventListener('submit', async e => {
     token = ''; $('token').value = ''; job = null; lock(false);
   }
 });
+
